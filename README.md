@@ -31,3 +31,7 @@ To build and run this application, ensure you have the following installed:
 3. Android SDK: API Level 24 (Android 7.0) or higher. (compiled on Android 36)
 4. Internet Connection: Required for API calls to the grammar engine and loading ads.
 
+**Limitations**
+1. Camera feature will not work
+2. Voice feature will not work
+
