@@ -28,7 +28,9 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -176,6 +178,7 @@ fun InitialInputCard(
                                 viewModel.setInitialState(false)
                             }
                         },
+                    textStyle = GrammarInputTextStyle,
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -183,7 +186,7 @@ fun InitialInputCard(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                     ),
-                    placeholder = { Text(stringResource(R.string.tap_to_type_english)) }
+                    placeholder = { Text(stringResource(R.string.tap_to_type_english), color = Color.LightGray, fontSize = 28.sp) }
                 )
                 
                 if (state.textFieldValue.text.isNotEmpty()) {
@@ -244,10 +247,10 @@ fun InitialInputCard(
                         Text(
                             text = stringResource(R.string.fix_errors),
                             color = Color.White,
-                            fontWeight = FontWeight.Bold,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.weight(1f),
                             textAlign = TextAlign.Center,
-                            fontSize = if (isLandscape) 14.sp else 16.sp
+                            fontSize = if (isLandscape) 12.sp else 14.sp
                         )
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
@@ -326,6 +329,7 @@ fun ResultsFlow(
                         .fillMaxWidth()
                         .heightIn(min = 150.dp)
                         .focusRequester(focusRequester),
+                    textStyle = GrammarInputTextStyle,
                     colors = TextFieldDefaults.colors(
                         focusedContainerColor = Color.Transparent,
                         unfocusedContainerColor = Color.Transparent,
@@ -333,7 +337,9 @@ fun ResultsFlow(
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
                     ),
-                    placeholder = { Text(stringResource(R.string.enter_text_here)) }
+                    placeholder = {
+                        Text(stringResource(R.string.enter_text_here), color = Color.LightGray, fontSize = 28.sp)
+                    }
                 )
                 
                 if (state.textFieldValue.text.isNotEmpty()) {
@@ -363,24 +369,41 @@ fun ResultsFlow(
                     }
                 } else {
                     Row {
-                        IconButton(onClick = { 
-                            viewModel.setInitialState(true) 
-                        }) {
-                            Icon(Icons.Outlined.Keyboard, contentDescription = stringResource(R.string.keyboard), tint = IconSecondary)
-                        }
-                        IconButton(onClick = { 
-                            val clipboardText = clipboardManager.getText()?.text
-                            if (clipboardText != null) {
-                                viewModel.appendText(clipboardText)
-                            } else {
-                                Toast.makeText(context, context.getString(R.string.clipboard_empty), Toast.LENGTH_SHORT).show()
+                        Box(
+                            modifier = Modifier
+                                .size(43.dp)
+                                .clip(CircleShape)
+                                .background(ActiveInputBoxButtonBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            IconButton(onClick = {
+                                viewModel.setInitialState(true)
+                            }) {
+                                Icon(painterResource(R.drawable.keyboard_hide_300), contentDescription = stringResource(R.string.keyboard), tint = IconPrimary)
                             }
-                        }) {
-                            Icon(Icons.Outlined.ContentPaste, contentDescription = stringResource(R.string.paste), tint = IconSecondary)
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(43.dp)
+                                .clip(CircleShape)
+                                .background(ActiveInputBoxButtonBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            IconButton(onClick = {
+                                val clipboardText = clipboardManager.getText()?.text
+                                if (clipboardText != null) {
+                                    viewModel.appendText(clipboardText)
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.clipboard_empty), Toast.LENGTH_SHORT).show()
+                                }
+                            }) {
+                                Icon(painterResource(R.drawable.content_copy), contentDescription = stringResource(R.string.paste), tint = IconPrimary)
+                            }
                         }
                     }
                 }
-
+                Spacer(modifier = Modifier.width(4.dp))
                 if (state.correctedText == null) {
                     Button(
                         onClick = {
@@ -391,9 +414,10 @@ fun ResultsFlow(
                                 Toast.makeText(context, context.getString(R.string.no_internet), Toast.LENGTH_SHORT).show()
                             }
                         },
+                        modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(24.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryBlue),
-                        contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
+                        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 8.dp)
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (state.isLoading) {
@@ -403,6 +427,8 @@ fun ResultsFlow(
                                     text = if (state.errors.isEmpty()) stringResource(R.string.fix_errors) else stringResource(R.string.fix_errors),
                                     color = Color.White,
                                     fontWeight = FontWeight.Bold,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.Center,
                                     fontSize = 14.sp
                                 )
                                 Spacer(Modifier.width(8.dp))
@@ -411,9 +437,42 @@ fun ResultsFlow(
                         }
                     }
                 } else {
-                    Row {
-                        IconButton(onClick = { /* Share */ }) {
-                            Icon(Icons.Outlined.Share, contentDescription = stringResource(R.string.share), tint = IconSecondary)
+                    Row(
+                        modifier = Modifier.wrapContentWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(43.dp)
+                                .clip(CircleShape)
+                                .background(ActiveInputBoxButtonBg),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            IconButton(onClick = {
+                                val clipboardText = clipboardManager.getText()?.text
+                                if (clipboardText != null) {
+                                    viewModel.appendText(clipboardText)
+                                } else {
+                                    Toast.makeText(context, context.getString(R.string.clipboard_empty), Toast.LENGTH_SHORT).show()
+                                }
+                            }) {
+                                Icon(painterResource(R.drawable.content_copy), contentDescription = stringResource(R.string.paste), tint = IconPrimary)
+                            }
+                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Box(
+                            modifier = Modifier
+                                .size(43.dp)
+                                .clip(CircleShape)
+                                .background(ActiveInputBoxButtonBg),
+                            contentAlignment = Alignment.Center
+                        ){
+                            Row {
+                                IconButton(onClick = { /* Share */ }) {
+                                    Icon(painterResource(R.drawable.share_300), contentDescription = stringResource(R.string.share), tint = IconPrimary)
+                                }
+                            }
                         }
                     }
                 }
@@ -434,8 +493,8 @@ fun ResultsFlow(
                 Text(
                     text = state.correctedText!!,
                     modifier = Modifier.fillMaxWidth().heightIn(min = 100.dp).padding(8.dp),
-                    fontSize = 16.sp,
-                    lineHeight = 24.sp
+                    fontSize = 28.sp,
+                    color = Color.Black
                 )
 
                 Row(
@@ -443,14 +502,48 @@ fun ResultsFlow(
                     horizontalArrangement = Arrangement.End,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = { /* Speak */ }) {
-                        Icon(Icons.Outlined.VolumeUp, contentDescription = stringResource(R.string.speak), tint = IconSecondary)
+                    Box(
+                        modifier = Modifier
+                            .size(43.dp)
+                            .clip(CircleShape)
+                            .background(ActiveInputBoxButtonBg),
+                        contentAlignment = Alignment.Center
+                    ){
+                        IconButton(onClick = { /* Speak */ }) {
+                            Icon(painterResource(R.drawable.sound_animation), contentDescription = stringResource(R.string.speak), tint = IconPrimary)
+                        }
                     }
-                    IconButton(onClick = { /* Copy */ }) {
-                        Icon(Icons.Outlined.ContentCopy, contentDescription = stringResource(R.string.copy), tint = IconSecondary)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(43.dp)
+                            .clip(CircleShape)
+                            .background(ActiveInputBoxButtonBg),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        IconButton(onClick = {
+                            val clipboardText = state.correctedText
+                            if (clipboardText != null) {
+                                clipboardManager?.setText(clipboardText)
+                                Toast.makeText(context, context.getString(R.string.clipboard_copied), Toast.LENGTH_SHORT).show()
+                            }
+                        }) {
+                            Icon(painterResource(R.drawable.content_copy), contentDescription = stringResource(R.string.paste), tint = IconPrimary)
+                        }
                     }
-                    IconButton(onClick = { /* Share */ }) {
-                        Icon(Icons.Outlined.Share, contentDescription = stringResource(R.string.share), tint = IconSecondary)
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Box(
+                        modifier = Modifier
+                            .size(43.dp)
+                            .clip(CircleShape)
+                            .background(ActiveInputBoxButtonBg),
+                        contentAlignment = Alignment.Center
+                    ){
+                        Row {
+                            IconButton(onClick = { /* Share */ }) {
+                                Icon(painterResource(R.drawable.share_300), contentDescription = stringResource(R.string.share), tint = IconPrimary)
+                            }
+                        }
                     }
                 }
             }
@@ -468,9 +561,17 @@ fun ResultsFlow(
             colors = ButtonDefaults.buttonColors(containerColor = ButtonPrimary)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Add, contentDescription = null, tint = Color.White)
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(CircleShape)
+                        .background(Color.White),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = null, tint = PrimaryBlue)
+                }
                 Spacer(Modifier.width(8.dp))
-                Text(stringResource(R.string.new_text), color = Color.White, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.new_text), color = Color.White, fontWeight = FontWeight.SemiBold, fontSize = 14.sp)
             }
         }
     }

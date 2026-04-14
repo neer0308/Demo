@@ -3,7 +3,7 @@
     <string name="grammar_check">Grammar Check</string>
     <string name="back">Back</string>
     <string name="help">Help</string>
-    <string name="enter_text_here">Please type… (English)</string>
+    <string name="enter_text_here">Please type (English)</string>
     <string name="clear">Clear</string>
     <string name="keyboard">Keyboard</string>
     <string name="voice">Voice</string>
@@ -16,6 +16,7 @@
     <string name="speak">Speak</string>
     <string name="new_text">New Text</string>
     <string name="clipboard_empty">Clipboard is empty</string>
+    <string name="clipboard_copied">Text Copied</string>
     <string name="feature_coming_soon">Feature coming soon :)</string>
     <string name="already_correct">It is already grammatically correct</string>
     <string name="bottom_nav_check">Check</string>
